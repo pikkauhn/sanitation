@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  roles         String
+  sessions      Session[]
+  password      String
+  otps          OTP[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Bin {
+  id              String       @id @default(uuid())
+  type            String
+  capacity        Int
+  location        Location?    @relation(fields: [location_id], references: [id])
+  location_id     String?
+  status          String
+  last_emptied_at DateTime?
+  history         BinHistory[]
+}
+
+model Location {
+  id        String       @id @default(uuid())
+  address   String
+  latitude  Float
+  longitude Float
+  notes     String?
+  billable  String?
+  bins      Bin[]
+  history   BinHistory[]
+}
+
+model BinHistory {
+  id         String    @id @default(uuid())
+  bin        Bin       @relation(fields: [binId], references: [id])
+  binId      String
+  location   Location  @relation(fields: [locationId], references: [id])
+  locationId String
+  startDate  DateTime
+  endDate    DateTime?
+}
+
+model OTP {
+  id                 String   @id @default(uuid())
+  user               User     @relation(fields: [userId], references: [id])
+  userId             String
+  code               Int      @unique
+  expirationDateTime DateTime
+}
