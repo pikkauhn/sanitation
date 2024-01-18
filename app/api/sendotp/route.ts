@@ -1,42 +1,45 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import nodemailer from 'nodemailer';
+import mailTransporter from '../../components/Transporter'
 import { PrismaClient } from '@prisma/client';
+import OTPGen from '../../components/OTPGen'
 
 const prisma = new PrismaClient();
 
-function setExpire() {
-    const d = new Date();
-    d.setTime(d.getTime() + (60*60*1000));
-    return d;
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const expire = setExpire();
-    const otpCode = 9; // Create OTP generator for this - include bcrypt
-    const otp = await prisma.oTP.create({
+    try {
+      const transporter = mailTransporter();
+      const { otpCode, hashedOTP } = await OTPGen();
+      const user = await prisma.user.findUnique({
+        where: { email: req.body.user },
+        select: { id: true }, 
+      });
+  
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+      }
+      const expirationDateTime = new Date(Date.now() + 60 * 60 * 1000);
+      const otp = await prisma.oTP.create({
         data: {
-            userId: '...',
-            code: otpCode,
-            expirationDateTime: expire,
+          userId: user.id,
+          code: hashedOTP,
+          expirationDateTime,
         },
-    });
-
-    const transporter = nodemailer.createTransport({
-        //  Setup for email provider
-    });
-
-    const mailOptions = {
-        from: 'z.burns@searcywater.org',
+      });
+  
+      const mailOptions = {
+        from: process.env.NEXT_PUBLIC_EMAIL_USER,
         to: req.body.email,
         subject: 'Your OTP for Verification',
         text: `Your OTP is: ${otpCode}`,
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: 'OTP sent successfully' });
+      };
+  
+      await transporter.sendMail(mailOptions);
+      res.status(200).json({ message: 'OTP sent successfully' });
     } catch (error) {
-        console.error('Error sending email:', error);
-        res.status(500).json({ message: 'Failed to send OTP' })
+      console.error('Error:', error);
+      res.status(500).json({ message: 'Failed to send OTP' });
+    } finally {
+      await prisma.$disconnect();
     }
-}
+  }

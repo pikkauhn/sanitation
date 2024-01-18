@@ -3,16 +3,27 @@ import { useRouter } from 'next/navigation'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 import React, { useState } from 'react'
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
+
+interface Roles {
+    name: string;    
+}
 
 const CredForm = () => {
     const router = useRouter();
 
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [employeeId, setEmployeeID] = useState('');
+
+    const [name, setName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [role, setRole] = useState<Roles | null>(null);
+    const [password, setPassword] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+
+    const roles: Roles[] = [
+        { name: 'Admin' },
+        { name: 'Coord' },
+        { name: 'Collector' },        
+    ]
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -27,26 +38,26 @@ const CredForm = () => {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        firstname: firstName,
-                        lastname: lastName,
+                        name: name,
                         email: email,
+                        role: role,
                         password: password,
                     }),
                 });
                 if (res) {
-                    router.replace('/')
+                    router.replace('/OTPEntry');
                 }
             } catch (error) {
-                console.log(error)
+                console.log(error);
             }
         }
     }
 
     return (
         <form className='flex flex-column' onSubmit={(e) => handleSubmit(e)}>
-            <InputText className='flex mb-2' id='name' placeholder='First Name' value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-            <InputText className='flex mb-2' id='name' placeholder='Last Name' value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <InputText className='flex mb-2' id='name' placeholder='First Name' value={name} onChange={(e) => setName(e.target.value)} />
             <InputText className='flex mb-2' type='email' id='email' placeholder='Email Address' value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Dropdown value={role} onChange={(e: DropdownChangeEvent) => setRole(e.value)} options={roles} optionLabel="name" placeholder="Select Role" />
             <InputText className='flex mb-2'
                 id='password' type='password' placeholder='Create Password' value={password}
                 onChange={(e) => setPassword(e.target.value)}

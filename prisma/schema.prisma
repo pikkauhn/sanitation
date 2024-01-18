@@ -10,66 +10,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model user {
   id            String    @id @default(uuid())
   name          String?
   email         String    @unique
   emailVerified DateTime?
-  image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   roles         String
-  sessions      Session[]
+  sessions      session[]
   password      String
-  otps          OTP[]
+  otps          oTP[]
 }
 
-model Session {
+model session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires      DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
-model Bin {
+model bin {
   id              String       @id @default(uuid())
   type            String
   capacity        Int
-  location        Location?    @relation(fields: [location_id], references: [id])
+  location        location?    @relation(fields: [location_id], references: [id])
   location_id     String?
   status          String
   last_emptied_at DateTime?
-  history         BinHistory[]
+  history         binHistory[]
 }
 
-model Location {
+model location {
   id        String       @id @default(uuid())
   address   String
   latitude  Float
   longitude Float
   notes     String?
   billable  String?
-  bins      Bin[]
-  history   BinHistory[]
+  bins      bin[]
+  history   binHistory[]
 }
 
-model BinHistory {
+model binHistory {
   id         String    @id @default(uuid())
-  bin        Bin       @relation(fields: [binId], references: [id])
+  bin        bin       @relation(fields: [binId], references: [id])
   binId      String
-  location   Location  @relation(fields: [locationId], references: [id])
+  location   location  @relation(fields: [locationId], references: [id])
   locationId String
   startDate  DateTime
   endDate    DateTime?
 }
 
-model OTP {
+model oTP {
   id                 String   @id @default(uuid())
-  user               User     @relation(fields: [userId], references: [id])
+  user               user     @relation(fields: [userId], references: [id])
   userId             String
-  code               Int      @unique
+  isVerified         Boolean?  @default(false)
+  code               String   @unique
   expirationDateTime DateTime
 }
