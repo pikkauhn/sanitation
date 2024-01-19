@@ -3,7 +3,7 @@ import OtpEntry from '@/app/components/OtpEntry'
 
 const page = () => {
   return (
-    <div>
+    <div className='relative flex w-full justify-content-center'>
         <OtpEntry />
     </div>
   )

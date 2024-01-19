@@ -6,21 +6,44 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 
 export default function OtpEntry() {
+    
     const [otp, setOtp] = useState('');
 
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()        
+            try {
+                const res = await fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/checkOTP", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        otp,
+                    }),
+                });
+                if (res.ok) {
+                    console.log(res.statusText)
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }    
+
     return (
-        <div className='relative flex w-full justify-content-center'>
+        <form className='flex flex-column' onSubmit={(e) => handleSubmit(e)}>
+
             <Card className='flex mt-8 justify-content-center text-center' title="Input OTP">
                 <OTPInput
                     value={otp}
                     onChange={setOtp}
                     numInputs={6}
-                    inputStyle={{ width: '2rem' }}
+                    inputStyle={{ width: '3rem' }}
                     renderSeparator={<span>-</span>}
                     renderInput={(props) => <InputText {...props} />}
                 />
                 <Button className='mt-4' type="submit" label="Submit" />
             </Card>
-        </div>
+        </form>
     )
 }

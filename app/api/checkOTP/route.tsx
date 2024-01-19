@@ -1,37 +1,56 @@
 import prisma from "@/app/lib/prisma";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
+import { NextResponse } from "next/server";
+import { cookies } from 'next/headers';
 import * as argon2 from "argon2";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+interface RequestBody {
+    otp: string,
+}
+
+export async function POST(req: NextApiRequest) {
     if (req.method === 'POST') {
+        const cookieStore = cookies();
+        const userIdCookie = cookieStore.get('userId');
+        const userId = userIdCookie?.value;
+
+        console.log(userId);
         try {
-            const { otp, userId } = req.body;
+            if (userId) {                
+                const passedValue = await new Response(req.body).text();
+                const body: RequestBody = JSON.parse(passedValue);
+                const { otp } = body;
 
-            const otpRecord = await prisma.oTP.findUnique({
-                where: { id: userId, isVerified: false },
-            });
-
-            if (!otpRecord) {
-                return res.status(404).json({ message: 'OTP not found or already verified' });
-            }
-
-            const isMatch = await argon2.verify(otpRecord.code, otp);
-            if (isMatch) {
-                await prisma.oTP.update({
-                    where: { id: otpRecord.id },
-                    data: { isVerified: true },
+                const otpRecord = await prisma.oTP.findFirst({
+                    where: { userId: userId, isVerified: false },
                 });
-                res.status(200).json({ message: 'OTP verified successfully' });
+
+                if (!otpRecord) {
+                    return NextResponse.json({ message: 'OTP not found or already verified' }, { status: 404 });
+                }
+
+                const isMatch = await argon2.verify(otpRecord.code, otp);
+                if (isMatch) {
+                    console.log('otp Match');
+                    await prisma.oTP.update({
+                        where: { id: otpRecord.id },
+                        data: { isVerified: true },
+                    });
+                    return NextResponse.json({ message: 'OTP verified successfully' }, { status: 200 });
+                } else {
+                    return NextResponse.json({ message: 'Invalid OTP' }, { status: 400 });
+                }
             } else {
-                res.status(400).json({ message: 'Invalid OTP' });
+                console.log('Error getting userId')
+                return NextResponse.json({ message: 'User not in cookies or header, they need to attempt to log in again' }, { status: 404 })
             }
         } catch (error) {
             console.error('Error verifying OTP: ', error);
-            res.status(500).json({ message: 'Failed to verify OTP' });
+            return NextResponse.json({ message: 'Failed to verify OTP' }, { status: 500 });
         } finally {
             await prisma.$disconnect();
         }
     } else {
-        res.status(405).json({ message: 'Method not allowed' });
+        return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
     }
 }

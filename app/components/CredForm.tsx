@@ -6,12 +6,11 @@ import React, { useState } from 'react'
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 
 interface Roles {
-    name: string;    
+    name: string;
 }
 
 const CredForm = () => {
-    const router = useRouter();
-
+    const router = useRouter();    
 
     const [name, setName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -22,7 +21,7 @@ const CredForm = () => {
     const roles: Roles[] = [
         { name: 'Admin' },
         { name: 'Coord' },
-        { name: 'Collector' },        
+        { name: 'Collector' },
     ]
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,18 +34,25 @@ const CredForm = () => {
                 const res = await fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/user", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
+                        "Content-Type": "application/json",                        
                     },
                     body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        role: role,
-                        password: password,
+                        name,
+                        email,
+                        role,
+                        password,
                     }),
-                });
-                if (res) {
+                })
+                if (res.ok) {
+                    const data = await res.json();
+                    const userId = await data.message;         
+                    document.cookie = (`userId=${userId}`);
+                    // localStorage.setItem('userId', userId);
                     router.replace('/OTPEntry');
-                }
+                } else {
+                    const data = await res.json();
+                    console.log(data.status, data.message)
+                }                
             } catch (error) {
                 console.log(error);
             }
@@ -55,15 +61,18 @@ const CredForm = () => {
 
     return (
         <form className='flex flex-column' onSubmit={(e) => handleSubmit(e)}>
-            <InputText className='flex mb-2' id='name' placeholder='First Name' value={name} onChange={(e) => setName(e.target.value)} />
+            <Dropdown className='flex mb-2' value={role} onChange={(e: DropdownChangeEvent) => setRole(e.value.name)}
+                options={roles} optionLabel="name" placeholder="Select Role" />
+            <InputText className='flex mb-2' id='name' placeholder='Full Name' value={name} onChange={(e) => setName(e.target.value)} />
             <InputText className='flex mb-2' type='email' id='email' placeholder='Email Address' value={email} onChange={(e) => setEmail(e.target.value)} />
-            <Dropdown value={role} onChange={(e: DropdownChangeEvent) => setRole(e.value)} options={roles} optionLabel="name" placeholder="Select Role" />
             <InputText className='flex mb-2'
                 id='password' type='password' placeholder='Create Password' value={password}
+                autoComplete='password'
                 onChange={(e) => setPassword(e.target.value)}
             />
             <InputText className='flex mb-2'
-                id='password' type='password' placeholder='Re-Enter Password' value={confirmPassword}
+                id='confirmPassword' type='password' placeholder='Re-Enter Password' value={confirmPassword}
+                autoComplete='password'
                 onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <Button className='mt-2' type="submit" label="Submit" />

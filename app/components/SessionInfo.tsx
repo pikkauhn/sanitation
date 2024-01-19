@@ -4,7 +4,7 @@ import { authOptions } from '../api/auth/[...nextauth]/route';
 
 const SessionInfo = async () => {    
     const session = await getServerSession(authOptions)
-    const user = session?.user
+    const user = session?.user    
     if (session) {
         return user
     } else {
