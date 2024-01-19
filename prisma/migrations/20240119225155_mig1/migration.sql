@@ -57,6 +57,7 @@ CREATE TABLE "binHistory" (
 CREATE TABLE "oTP" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
+    "isVerified" BOOLEAN DEFAULT false,
     "code" TEXT NOT NULL,
     "expirationDateTime" DATETIME NOT NULL,
     CONSTRAINT "oTP_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
