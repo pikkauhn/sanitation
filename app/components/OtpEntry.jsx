@@ -4,9 +4,10 @@ import { InputText } from 'primereact/inputtext';
 import OTPInput from 'react-otp-input';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
+import { useRouter } from 'next/navigation'
 
 export default function OtpEntry() {
-    
+    const router = useRouter();
     const [otp, setOtp] = useState('');
 
 
@@ -24,6 +25,7 @@ export default function OtpEntry() {
                 });
                 if (res.ok) {
                     console.log(res.statusText)
+                    router.replace('/')
                 }
             } catch (error) {
                 console.log(error);

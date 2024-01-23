@@ -19,9 +19,9 @@ async function Navbar() {
   let show = false;
   let admin = false;
   if (user) {
-    if (user.firstname) {
+    if (user.name) {
       show = true;
-      if (user.isAdmin) {
+      if (user.roles === 'Admin') {        
         admin = true;
       }
     }
@@ -30,7 +30,7 @@ async function Navbar() {
   const items = [
     {
       label: 'Home',
-      url: '/Landing',
+      url: '/',
       visible: show
     },
     {
