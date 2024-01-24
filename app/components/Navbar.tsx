@@ -30,7 +30,7 @@ async function Navbar() {
   const items = [
     {
       label: 'Home',
-      url: '/',
+      url: '/Data',
       visible: show
     },
     {

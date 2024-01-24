@@ -7,7 +7,7 @@ import React from 'react'
 const SigninButton = () => {
     const { data: session } = useSession()   
     if (session && session.user) {
-        const userName = session.user.email;
+        const userName = session.user.name;
         if (userName) {
             const name = userName.charAt(0).toUpperCase() + userName.slice(1);
             return (name &&
