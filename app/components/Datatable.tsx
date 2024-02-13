@@ -1,10 +1,11 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FilterMatchMode } from 'primereact/api';
 import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
+import { useRouter } from 'next/navigation';
 
 interface Item {
     id: String,
@@ -15,13 +16,42 @@ interface Item {
     last_emptied_at: Date
 }
 
-const Datatable: React.FC<{ items: Item[]; loading: boolean}> = ({ items, loading }) => {    
+const Datatable = () => {
+    const router = useRouter();
     const defaultFilters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     };
-    const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+    const [result, setResult] = useState<Item[] | undefined>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [selectedItem, setSelectedItem] = useState<Item[] | null>(null);
     const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
+
+    useEffect(() => {
+        const getResults = async () => {
+            try {
+                const bins = await fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + '/api/getBins', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }).then(async (response) => {
+                    if (!response.ok) {
+                        console.error(`Failed to fetch data. Status: ${response.status}`)
+                    }               
+                    else {
+                        const binResponse = await response.json();
+                        setResult(binResponse);
+                        setLoading(false);
+                    }
+                });                               
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        getResults();
+        
+    }, [])    
 
     const initFilters = () => {
         setFilters(defaultFilters);
@@ -29,12 +59,11 @@ const Datatable: React.FC<{ items: Item[]; loading: boolean}> = ({ items, loadin
     };
 
     const columns = [
-        { field: 'BinID', header: 'BinID' },
-        { field: 'Capacity', header: 'Capacity' },
-        { field: 'Location', header: 'Location' },
-        { field: 'Status', header: 'Status' },
-        { field: 'LastEmptied', header: 'Last Emptied' },
-        { field: 'Charge', header: 'Charge' },
+        { field: 'location.address', header: 'Location' },
+        { field: 'last_emptied_at', header: 'Last Emptied' },
+        { field: 'type', header: 'Type' },
+        { field: 'status', header: 'Status' },
+        { field: 'charge', header: 'Charge' },
 
     ]
     const clearFilter = () => {
@@ -51,19 +80,19 @@ const Datatable: React.FC<{ items: Item[]; loading: boolean}> = ({ items, loadin
         setFilters((prevFilters) => ({ ...prevFilters, global: { value, matchMode: FilterMatchMode.CONTAINS } }));
     }
 
-    const onRowSelect = (event: { data: { Id: string; }; }) => {
-        window.open('https://www.karafun.com/web/?song=' + event.data.Id)
+    const onRowSelect = (event: { data: any }) => {
+        router.replace(`/Data/${event.data.id}`);
     };
 
     const renderHeader = () => {
         return (
             <div>
                 <span>
-                    <Button className="mr-2" type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
                     <span className="p-input-icon-left">
                         <InputText id="employeeSearch" value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
-                        <Button className="mr-2" type="button" icon="pi pi-search" label="Search" outlined onClick={searchFilter} />
+                        <Button className="ml-2" type="button" icon="pi pi-search" label="Search" outlined onClick={searchFilter} />
                     </span>
+                    <Button className="ml-2" type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
                 </span>
             </div>
         )
@@ -74,7 +103,7 @@ const Datatable: React.FC<{ items: Item[]; loading: boolean}> = ({ items, loadin
     return (
         <div>
             <DataTable
-                value={items}
+                value={result}
                 paginator
                 rows={20}
                 filters={filters}
@@ -82,12 +111,12 @@ const Datatable: React.FC<{ items: Item[]; loading: boolean}> = ({ items, loadin
                 filterDisplay="row"
                 selectionMode="single"
                 selection={selectedItem ? selectedItem : null}
-                onSelectionChange={(e) => setSelectedItem(e.value as Item)}
+                onSelectionChange={(e) => setSelectedItem(e.value as Item[])}
                 onRowSelect={onRowSelect}
                 metaKeySelection={false}
                 globalFilterFields={['BinID', 'Capacity', 'Location', 'Status', 'LastEmptied', 'Charge']}
                 header={header}
-                emptyMessage="No Songs Found"
+                emptyMessage="No Bins Found"
                 tableStyle={{ minWidth: '50rem' }}
             >
                 {columns.map((col) => {

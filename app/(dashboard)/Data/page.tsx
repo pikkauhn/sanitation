@@ -1,8 +1,11 @@
 import React from 'react'
+import Datatable from '@/app/components/Datatable'
 
 function page() {
   return (
-    <div>page</div>
+    <div>
+      <Datatable />
+    </div>
   )
 }
 

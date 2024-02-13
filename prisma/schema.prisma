@@ -35,8 +35,8 @@ model session {
 
 model bin {
   id              String       @id @default(uuid())
-  type            String
-  capacity        Int
+  size_id         String?
+  size            binSizes?    @relation(fields: [size_id], references: [id])
   location        location?    @relation(fields: [location_id], references: [id])
   location_id     String?
   status          String
@@ -44,13 +44,22 @@ model bin {
   history         binHistory[]
 }
 
+model binSizes {
+  id     String @id @default(uuid())
+  size   String
+  charge Float
+  bin    bin[]
+}
+
 model location {
   id        String       @id @default(uuid())
   address   String
   latitude  Float
   longitude Float
+  // GaiGPS - ask Travis
   notes     String?
   billable  String?
+  days      Int?
   bins      bin[]
   history   binHistory[]
 }
@@ -69,7 +78,7 @@ model oTP {
   id                 String   @id @default(uuid())
   user               user     @relation(fields: [userId], references: [id])
   userId             String
-  isVerified         Boolean?  @default(false)
+  isVerified         Boolean? @default(false)
   code               String   @unique
   expirationDateTime DateTime
 }
