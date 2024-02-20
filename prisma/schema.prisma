@@ -59,7 +59,7 @@ model location {
   // GaiGPS - ask Travis
   notes     String?
   billable  String?
-  days      Int?
+  days      Int?        @default(0)
   bins      bin[]
   history   binHistory[]
 }

@@ -8,8 +8,8 @@ interface RequestBody {
 }
 
 export async function POST(request: Request) {
-    const body:RequestBody = await request.json();
-    const id = body.id;    
+    const body: RequestBody = await request.json();
+    const id = body.id;
     try {
         const result = await prisma.bin.findFirst({
             where: {
@@ -18,10 +18,14 @@ export async function POST(request: Request) {
             include: {
                 size: true,
                 location: true,
-                history: true,
+                history: {
+                    include: {
+                        location: true,
+                    },
+                },
             }
-        });      
-        return NextResponse.json( result, { status: 200 });
+        });
+        return NextResponse.json(result, { status: 200 });
     } catch (error) {
         console.error('Error: ', error);
         return NextResponse.json({ message: 'Failed to fetch data' }, { status: 500 });

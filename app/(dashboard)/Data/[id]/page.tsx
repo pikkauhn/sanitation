@@ -1,6 +1,11 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
+import { Accordion, AccordionTab, AccordionTabChangeEvent } from 'primereact/accordion';
+import moment from 'moment';
+
+import { binHistory } from '@prisma/client';
+import OrderHistory from '@/app/components/OrderHistory';
 
 interface Params {
     id: number;
@@ -17,6 +22,7 @@ interface Bin {
 
 interface History {
     id: string,
+    location: Location[],
     startDate: Date,
     endDate: Date,
 }
@@ -44,6 +50,8 @@ export default function page({ params }: {
 }) {
     const binId = params.id;
     const [bin, setBin] = useState<Bin>();
+    const [binHistory, setBinHistory] = useState<binHistory[]>();
+    const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
     useEffect(() => {
         const getBin = async () => {
@@ -60,22 +68,44 @@ export default function page({ params }: {
                     console.error(`Failed to fetch data. Status: ${response.status}`);
                 }
                 else {
-                    const binResponse = await response.json();
-                    console.log(binResponse);
+                    const binResponse = await response.json();                    
                     setBin(binResponse);
+                    const orderedHistory = OrderHistory(binResponse.history);
+                    setBinHistory(orderedHistory);
                 }
             });
         }
         getBin();
     }, []);
 
+    const onTabChange = (e: AccordionTabChangeEvent) => {
+        const selectedIndex: number | null = e.index as number | null;
+        setActiveIndex(selectedIndex)
+      }
 
 
     return (
-        <div>
-            <div className='card w-5'>
-                <Card title={bin?.status}></Card>
-            </div>
+        <div className='flex justify-content-center mt-2'>
+            {bin ?
+            <Card className='mt-3 w-30rem text-center mr-5' title={bin?.status}>
+                <Accordion activeIndex={activeIndex} onTabChange={(e: AccordionTabChangeEvent) => {onTabChange(e)}}>
+                
+                {binHistory?.map((data: any, idx: number) => (
+                    <AccordionTab className="w-full" key={idx} header={data.location.address}>
+                        Start Date: {moment(data.startDate).format('MMMM Do, YYYY')}
+                        <br/>
+                        End Date: {data.endDate ? moment(data.endDate).format('MMMM Do, YYYY') : 'Current Location'}
+                        <br/>
+                        Billed by: {data.location.billable ? 'Sanitation' : 'Searcy Water'}
+                        <br/>
+                        Daily Amount: {data.location.billable ? data.location.billable : 'Searcy Water'}
+                        <br/>
+                        Number of Days: {data.location.days}
+                    </AccordionTab>
+                ))}
+                </Accordion>
+            </Card>
+            :  <Card className='mt-3 w-30rem text-center mr-5' title='No Bin Selected' />}
         </div>
     )
 }
