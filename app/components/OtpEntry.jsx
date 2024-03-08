@@ -25,7 +25,7 @@ export default function OtpEntry() {
                 });
                 if (res.ok) {
                     console.log(res.statusText)
-                    router.replace('/Data')
+                    router.replace('/api/auth/signin')
                 }
             } catch (error) {
                 console.log(error);

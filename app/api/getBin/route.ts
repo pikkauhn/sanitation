@@ -16,13 +16,13 @@ export async function POST(request: Request) {
                 id
             },
             include: {
-                size: true,
                 location: true,
                 history: {
                     include: {
                         location: true,
                     },
                 },
+                customer: true,
             }
         });
         return NextResponse.json(result, { status: 200 });

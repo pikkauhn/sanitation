@@ -1,4 +1,6 @@
+
 import { Menubar } from 'primereact/menubar';
+import { MenuItem } from 'primereact/menuitem';
 import React from 'react'
 
 import SigninButton from './SigninButton';
@@ -27,26 +29,13 @@ async function Navbar() {
     }
   }
 
-  const items = [
-    {
-      label: 'Home',
-      url: '/Data',
-      visible: show
-    },
-    {
-      label: 'Register',
-      url: '/Register',
-      visible: !show
-    },
-    {
-      label: 'Administration',
-      url: '/Admin',
-      visible: admin,
-    }
-  ]
+  const items: MenuItem[] = [
+    { label: 'Home', url: '/Data', visible: show, id: 'home' },
+    { label: 'Register', url: '/Register', visible: !show, id: 'register' },
+    { label: 'Administration', url: '/Admin', visible: admin, id: 'admin' }
+  ];
 
   const end = <SigninButton />
-
   return (
     <Menubar model={items} end={end} />
   )
