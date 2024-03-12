@@ -1,4 +1,5 @@
 "use client"
+import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext'
@@ -6,12 +7,31 @@ import { Nullable } from 'primereact/ts-helpers';
 import React, { useState } from 'react'
 
 const BinSizeForm = () => {
-
+    const router = useRouter();
     const [size, setSize] = useState<string>('');
     const [charge, setCharge] = useState<Nullable <number | null>>();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        try {
+            const res = await fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/newSize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",                        
+                },
+                body: JSON.stringify({
+                    size,
+                    charge
+                }),
+            })
+            if (res.ok) {
+                
+            } else {
+                console.log('Error Creating New Bin Size')
+            }                
+        } catch (error) {
+            console.log('Error Connecting to Database')
+        }
     }
 
     return (

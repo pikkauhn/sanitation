@@ -14,7 +14,6 @@ export async function POST(req: NextApiRequest) {
         const userIdCookie = cookieStore.get('userId');
         const userId = userIdCookie?.value;
 
-        console.log(userId);
         try {
             if (userId) {                
                 const passedValue = await new Response(req.body).text();
@@ -31,7 +30,6 @@ export async function POST(req: NextApiRequest) {
 
                 const isMatch = await argon2.verify(otpRecord.code, otp);
                 if (isMatch) {
-                    console.log('otp Match');
                     await prisma.oTP.update({
                         where: { id: otpRecord.id },
                         data: { isVerified: true },
@@ -41,7 +39,6 @@ export async function POST(req: NextApiRequest) {
                     return NextResponse.json({ message: 'Invalid OTP' }, { status: 400 });
                 }
             } else {
-                console.log('Error getting userId')
                 return NextResponse.json({ message: 'User not in cookies or header, they need to attempt to log in again' }, { status: 404 })
             }
         } catch (error) {

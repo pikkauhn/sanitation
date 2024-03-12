@@ -72,6 +72,8 @@ model Customer {
   id         String       @id @default(uuid())
   location   Location?    @relation(fields: [locationId], references: [id])
   locationId String?
+  name       String
+  status     Boolean
   bins       Bin[]
   billable   String?
   binhistory BinHistory[]

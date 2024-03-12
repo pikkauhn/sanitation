@@ -41,7 +41,6 @@ export default function page({ params }: {
                     setCustomer(binResponse.customer);
                     const orderedHistory = OrderHistory(binResponse.history);                    
                     setBinHistory(orderedHistory);
-                    console.log(binResponse.customer)
                 }
             });
         }

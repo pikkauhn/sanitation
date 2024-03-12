@@ -1,24 +1,31 @@
-import BinSizeForm from '@/app/components/BinSizeForm'
-import NewBinForm from '@/app/components/NewBinForm'
-import NewCustomerForm from '@/app/components/NewCustomerForm'
-import NewLocationForm from '@/app/components/NewLocationForm'
-import React from 'react'
+import React from 'react';
+import { Accordion, AccordionTab } from 'primereact/accordion';
+
+import BinSizeForm from '@/app/components/BinSizeForm';
+import NewBinForm from '@/app/components/NewBinForm';
+import NewCustomerForm from '@/app/components/NewCustomerForm';
+import NewLocationForm from '@/app/components/NewLocationForm';
+import { Card } from 'primereact/card';
 
 const page = () => {
   return (
-    <div>Forms:
-      <hr />
-      <li>Bin Sizes</li>
-      <BinSizeForm />
-      <hr />
-      <li>Bins</li>
-      <NewBinForm />
-      <hr />
-      <li>Customer</li>
-      <NewCustomerForm />
-      <hr />
-      <li>Location</li>
-      <NewLocationForm />
+    <div className="card">
+      <Card className='mt-2 w-4'>
+      <Accordion activeIndex={null}>
+        <AccordionTab header="New Bin Size">
+          <BinSizeForm />
+        </AccordionTab>
+        <AccordionTab header="New Bin">
+          <NewBinForm />
+        </AccordionTab>
+        <AccordionTab header="New Customer">
+          <NewCustomerForm />
+        </AccordionTab>
+        <AccordionTab header="New Location">
+          <NewLocationForm />
+        </AccordionTab>
+      </Accordion>
+      </Card>
     </div>
   )
 }

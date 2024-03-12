@@ -22,7 +22,6 @@ export async function POST(request: Request) {
             ...userWithoutPass,
             accessToken,
         }
-        console.log(result)
         return new Response(JSON.stringify(result));
     }
     else return new Response(JSON.stringify(null));

@@ -35,8 +35,7 @@ export async function POST(request: Request){
 
     const {password, ...result} = user;    
     const setTime = timeOff;
-    console.log(result);
-    console.log(setTime);
+
 
     return new Response(JSON.stringify(result));
 }

@@ -51,10 +51,9 @@ const CredForm = () => {
                     router.replace('/OTPEntry');
                 } else {
                     const data = await res.json();
-                    console.log(data.status, data.message)
                 }                
             } catch (error) {
-                console.log(error);
+                
             }
         }
     }

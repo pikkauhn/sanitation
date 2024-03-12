@@ -1,37 +1,17 @@
 "use client"
 import { Button } from 'primereact/button';
-import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
-import { InputText } from 'primereact/inputtext'
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
-import { Nullable } from 'primereact/ts-helpers';
 import React, { useEffect, useState } from 'react'
-
-interface binSize {
-    id: String,
-    size: String,
-    charge: Number,
-}
 
 interface sizeDropDown {
     size: String | null,
     id: number
 }
 
-interface statusDropDown {
-    status: String
-}
-
-
 const NewBinForm = () => {
 
     const [size, setSize] = useState<string | null>(null);
     const [sizes, setSizes] = useState<sizeDropDown[]>();
-    const [status, setStatus] = useState<statusDropDown>();
-
-    const statuses: statusDropDown[] = [
-        { status: 'active' },
-        { status: 'inactive' }
-    ]
 
     useEffect(() => {
         const getSizes = async () => {
@@ -64,7 +44,24 @@ const NewBinForm = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(status);
+        try {
+            const res = await fetch(process.env.NEXT_PUBLIC_NEXTAUTH_URL + "/api/newSize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",                        
+                },
+                body: JSON.stringify({
+                    size
+                }),
+            })
+            if (res.ok) {
+                
+            } else {
+                console.log('Error Creating New Bin')
+            }                
+        } catch (error) {
+            console.log('Error Connecting to Database')
+        }
     }
 
     return (
