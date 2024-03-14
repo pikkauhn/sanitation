@@ -12,30 +12,30 @@ interface RequestBody {
 }
 
 export async function POST(request: Request){
-    const body:RequestBody = await request.json();
+    // const body:RequestBody = await request.json();
 
-    const user = await prisma.user.create({
-        data:{
-            employeeId: body.employeeId,
-            firstname: body.firstname,
-            lastname: body.lastname,
-            dept: body.dept,
-            isAdmin: body.isAdmin,
-            phone: body.phone,
-            password: '',            
-        },
-    });
-    const timeOff = await prisma.timeOffBalance.create({
-        data:{
-            userId: body.employeeId,
-            year: body.yearly,
-            balance: body.balance,
-        },
-    })
+    // const user = await prisma.user.create({
+    //     data:{
+    //         employeeId: body.employeeId,
+    //         firstname: body.firstname,
+    //         lastname: body.lastname,
+    //         dept: body.dept,
+    //         isAdmin: body.isAdmin,
+    //         phone: body.phone,
+    //         password: '',            
+    //     },
+    // });
+    // const timeOff = await prisma.timeOffBalance.create({
+    //     data:{
+    //         userId: body.employeeId,
+    //         year: body.yearly,
+    //         balance: body.balance,
+    //     },
+    // })
 
-    const {password, ...result} = user;    
-    const setTime = timeOff;
+    // const {password, ...result} = user;    
+    // const setTime = timeOff;
 
 
-    return new Response(JSON.stringify(result));
+    return new Response(JSON.stringify('test'));
 }
