@@ -5,7 +5,7 @@ import OTPGen from '../../components/OTPGen'
 
 const prisma = new PrismaClient();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const transporter = mailTransporter();
       const { otpCode, hashedOTP } = await OTPGen();
