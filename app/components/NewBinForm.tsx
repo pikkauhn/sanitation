@@ -5,7 +5,8 @@ import React, { useEffect, useState } from 'react'
 
 interface sizeDropDown {
     size: String | null,
-    id: number
+    id: number,
+    charge: number
 }
 
 const NewBinForm = () => {
@@ -30,7 +31,7 @@ const NewBinForm = () => {
                     const binResponse = await res.json();
                     let binSizes: sizeDropDown[] = [];
                     binResponse.map((data: any, idx: number) => {
-                        binSizes.push({ size: data.size, id: idx });
+                        binSizes.push({ size: data.size, id: data.id, charge: data.charge });
                     })
                     setSizes(binSizes);
                 }
