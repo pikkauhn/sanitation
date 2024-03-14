@@ -1,5 +1,5 @@
 import prisma from "@/app/lib/prisma";
-import { NextApiRequest } from "next";
+import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { cookies } from 'next/headers';
 import * as argon2 from "argon2";
@@ -8,7 +8,7 @@ interface RequestBody {
     otp: string,
 }
 
-export async function POST(req: NextApiRequest) {
+export async function POST(req: NextRequest) {
     if (req.method === 'POST') {
         const cookieStore = cookies();
         const userIdCookie = cookieStore.get('userId');
