@@ -1,8 +1,7 @@
 import NextAuth from "next-auth/next";
-import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials"
 
-export const authOptions: AuthOptions = {    
+export const authOptions = {    
     providers:[
         CredentialsProvider({
             name: "Credentials",
@@ -43,7 +42,7 @@ export const authOptions: AuthOptions = {
       },
 
       async session({session,token}){
-        session.user = token as any;
+        session.user = token;
         return session
       }
     }
