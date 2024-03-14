@@ -1,11 +1,11 @@
-import { binHistory } from "@prisma/client";
+import { BinHistory } from "@prisma/client";
 
 export default function OrderHistory(Response: any) {
-    const adjustedHistory = Response.map((data: binHistory) => ({
+    const adjustedHistory = Response.map((data: BinHistory) => ({
         ...data
     }));
 
-    const orderedHistory: binHistory[] = adjustedHistory.sort((
+    const orderedHistory: BinHistory[] = adjustedHistory.sort((
         historyA: { id: string; startDate: Date; endDate: Date | null },
         historyB: { id: string; startDate: Date; endDate: Date | null }
     ) => {
