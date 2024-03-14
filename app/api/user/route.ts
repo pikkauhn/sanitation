@@ -1,5 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from '@prisma/client';
 import * as argon2 from 'argon2';
 
@@ -15,7 +14,7 @@ interface RequestBody {
     password: string,
 }
 
-export async function POST(req: NextApiRequest) {            
+export async function POST(req: NextRequest) {            
     if (req.method === 'POST') {
         try {
             const transporter = mailTransporter();
